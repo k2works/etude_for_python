@@ -1,0 +1,2 @@
+# etude_for_python
+Pythonアプリケーションのための練習プログラム集
