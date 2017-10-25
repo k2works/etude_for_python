@@ -14,10 +14,11 @@ markdown:
 
 + [x] ~~テストメソッドを呼び出す~~
 + [x] ~~setUpを最初に呼び出す~~
-+ [ ] tearDownを後に呼び出す
++ [x] ~~tearDownを後に呼び出す~~
 + [ ] テストメソッドが失敗したとしてもtearDownを呼び出す
 + [ ] 複数のテストを走らせる
 + [ ] 収集したテスト結果を出力する
++ [x] ~~WasRunで文字列をログに記録する~~
 
 
 ## コアモデル
@@ -25,18 +26,20 @@ markdown:
 class TestCase {
   name
   setUp()
+  tearDown()
   run()
 }
 class WasRun {
-  wasRun  
-  wasSetUp
+  log
   setUp()  
+  tearDown()
   testMethod()
 }
 
-class TestCaseTest {
-  testRunning()
-  testSetUp()
+class TestCaseTest {  
+  test
+  setUp()
+  testTemplateMethod()
 }
 TestCase <|-- TestCaseTest
 TestCase <|-- WasRun
