@@ -13,7 +13,7 @@ markdown:
 ## TODOリスト
 
 + [x] ~~テストメソッドを呼び出す~~
-+ [ ] setUpを最初に呼び出す
++ [x] ~~setUpを最初に呼び出す~~
 + [ ] tearDownを後に呼び出す
 + [ ] テストメソッドが失敗したとしてもtearDownを呼び出す
 + [ ] 複数のテストを走らせる
@@ -24,19 +24,23 @@ markdown:
 ```puml
 class TestCase {
   name
+  setUp()
   run()
 }
 class WasRun {
   wasRun  
-  name
+  wasSetUp
+  setUp()  
   testMethod()
 }
 
 class TestCaseTest {
   testRunning()
+  testSetUp()
 }
-TestCaseTest -> WasRun
+TestCase <|-- TestCaseTest
 TestCase <|-- WasRun
+TestCaseTest -> WasRun
 
 
 ```
