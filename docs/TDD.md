@@ -14,7 +14,7 @@
 + [x] ~~tearDownを後に呼び出す~~
 + [ ] テストメソッドが失敗したとしてもtearDownを呼び出す
 + [ ] 複数のテストを走らせる
-+ [ ] 収集したテスト結果を出力する
++ [x] ~~収集したテスト結果を出力する~~
 + [x] ~~WasRunで文字列をログに記録する~~
   
   
@@ -23,7 +23,7 @@
 
 ```
 ImageMagick is required to be installed to convert svg to png.
-Error: Command failed: magick /var/folders/r9/tltm498s7g516t2prbpxr3pw0000gn/T/mume-svg117925-34633-12gz5rw.vx87uy2e29.svg /Users/k2works/Projects/k2works/etude_for_python/docs/assets/4f720d7448016afafbb156e658618f7e0.png
+Error: Command failed: magick /var/folders/r9/tltm498s7g516t2prbpxr3pw0000gn/T/mume-svg117925-34633-ulumir.mr2d927qfr.svg /Users/k2works/Projects/k2works/etude_for_python/assets/7f51d579f1e287ad1c2d16b6690ec7be0.png
 magick: xmlParseComment: invalid xmlChar value 8
  `No such file or directory` @ error/svg.c/SVGError/2680.
 
@@ -33,6 +33,16 @@ magick: xmlParseComment: invalid xmlChar value 8
 ## `xunit.py`
   
 ```py
+class TestResult:
+    def __init__(self):
+        self.runCount = 0
+  
+    def testStarted(self):
+        self.runCount = self.runCount + 1
+  
+    def summary(self):
+        return "1 run, 0 failed"
+  
 class TestCase:
     def __init__(self, name):
         self.name = name
@@ -44,10 +54,13 @@ class TestCase:
         pass
   
     def run(self):
+        result = TestResult()
+        result.testStarted()
         self.setUp()
         method = getattr(self, self.name)
         method()
         self.tearDown()
+        return result
   
   
 class WasRun(TestCase):
@@ -56,6 +69,9 @@ class WasRun(TestCase):
   
     def testMethod(self):
         self.log = self.log + "testMethod "
+  
+    def testBrokenMethod(self):
+        raise Exception
   
     def tearDown(self):
         self.log = self.log + "tearDown "
@@ -69,7 +85,19 @@ class TestCaseTest(TestCase):
         self.test.run()
         assert("setUp testMethod tearDown " == self.test.log)
   
+    def testResult(self):
+        test = WasRun("testMethod")
+        result = test.run()
+        assert("1 run, 0 failed" == result.summary())
+  
+    def testFailedResult(self):
+        test = WasRun("testBrokenMethod")
+        result = test.run()
+        assert("1 run, 1 failed" == result.summary())
+  
   
 TestCaseTest("testTemplateMethod").run()
+TestCaseTest("testResult").run()
+# TestCaseTest("testFailedResult").run()
 ```  
   
