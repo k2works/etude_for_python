@@ -16,19 +16,14 @@
 + [ ] 複数のテストを走らせる
 + [x] ~~収集したテスト結果を出力する~~
 + [x] ~~WasRunで文字列をログに記録する~~
++ [x] ~~失敗したテストを出力する~~
++ [ ] setUpのエラーをキャッチして出力する
   
   
 ## コアモデル
   
 
-```
-ImageMagick is required to be installed to convert svg to png.
-Error: Command failed: magick /var/folders/r9/tltm498s7g516t2prbpxr3pw0000gn/T/mume-svg117925-34633-ulumir.mr2d927qfr.svg /Users/k2works/Projects/k2works/etude_for_python/assets/7f51d579f1e287ad1c2d16b6690ec7be0.png
-magick: xmlParseComment: invalid xmlChar value 8
- `No such file or directory` @ error/svg.c/SVGError/2680.
-
-```  
-
+![](assets/4f720d7448016afafbb156e658618f7e0.png?0.17824358580490451)  
   
 ## `xunit.py`
   
@@ -36,12 +31,16 @@ magick: xmlParseComment: invalid xmlChar value 8
 class TestResult:
     def __init__(self):
         self.runCount = 0
+        self.errorCount = 0
   
     def testStarted(self):
         self.runCount = self.runCount + 1
   
+    def testFailed(self):
+        self.errorCount = self.errorCount + 1
+  
     def summary(self):
-        return "1 run, 0 failed"
+        return "%d run, %d failed" % (self.runCount, self.errorCount)
   
 class TestCase:
     def __init__(self, name):
@@ -57,8 +56,11 @@ class TestCase:
         result = TestResult()
         result.testStarted()
         self.setUp()
-        method = getattr(self, self.name)
-        method()
+        try:
+            method = getattr(self, self.name)
+            method()
+        except:
+            result.testFailed()
         self.tearDown()
         return result
   
@@ -96,8 +98,9 @@ class TestCaseTest(TestCase):
         assert("1 run, 1 failed" == result.summary())
   
   
-TestCaseTest("testTemplateMethod").run()
-TestCaseTest("testResult").run()
-# TestCaseTest("testFailedResult").run()
+print(TestCaseTest("testTemplateMethod").run().summary())
+print(TestCaseTest("testResult").run().summary())
+print(TestCaseTest("testFailedResult").run().summary())
+print(TestCaseTest("testFailedResultFormatting").run().summary())
 ```  
   

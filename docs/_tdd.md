@@ -19,23 +19,30 @@ markdown:
 + [ ] 複数のテストを走らせる
 + [x] ~~収集したテスト結果を出力する~~
 + [x] ~~WasRunで文字列をログに記録する~~
++ [x] ~~失敗したテストを出力する~~
++ [ ] setUpのエラーをキャッチして出力する
 
 
 ## コアモデル
 ```puml
+class TestResult {
+  runCount
+  errorCount
+  testStarted()
+  testFailed()
+}
 class TestCase {
   name
   setUp()
-  tearDown()
+  tearDown()
   run()
 }
 class WasRun {
   log
   setUp()  
-  tearDown()
+  tearDown()
   testMethod()
 }
-
 class TestCaseTest {  
   test
   setUp()
@@ -44,8 +51,7 @@ class TestCaseTest {
 TestCase <|-- TestCaseTest
 TestCase <|-- WasRun
 TestCaseTest -> WasRun
-
-
+TestCase -> TestResult
 ```
 
 ## `xunit.py`
