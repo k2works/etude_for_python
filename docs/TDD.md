@@ -13,17 +13,17 @@
 + [x] ~~setUpを最初に呼び出す~~
 + [x] ~~tearDownを後に呼び出す~~
 + [ ] テストメソッドが失敗したとしてもtearDownを呼び出す
-+ [ ] 複数のテストを走らせる
++ [x] ~~複数のテストを走らせる~~
 + [x] ~~収集したテスト結果を出力する~~
 + [x] ~~WasRunで文字列をログに記録する~~
 + [x] ~~失敗したテストを出力する~~
 + [ ] setUpのエラーをキャッチして出力する
-  
++ [ ] TestCaseクラスからTestSuiteを作る
   
 ## コアモデル
   
 
-![](assets/4f720d7448016afafbb156e658618f7e0.png?0.17824358580490451)  
+![](assets/4f720d7448016afafbb156e658618f7e0.png?0.8500021906420505)  
   
 ## `xunit.py`
   
@@ -52,8 +52,7 @@ class TestCase:
     def tearDown(self):
         pass
   
-    def run(self):
-        result = TestResult()
+    def run(self, result):
         result.testStarted()
         self.setUp()
         try:
@@ -62,8 +61,17 @@ class TestCase:
         except:
             result.testFailed()
         self.tearDown()
-        return result
   
+class TestSuite:
+    def __init__(self):
+        self.tests = []
+  
+    def add(self, test):
+        self.tests.append(test)
+  
+    def run(self, result):
+        for test in self.tests:
+            test.run(result)
   
 class WasRun(TestCase):
     def setUp(self):
@@ -81,26 +89,43 @@ class WasRun(TestCase):
   
 class TestCaseTest(TestCase):
     def setUp(self):
-        self.test = WasRun("testMethod")
+        self.result = TestResult()
   
     def testTemplateMethod(self):
-        self.test.run()
-        assert("setUp testMethod tearDown " == self.test.log)
+        test = WasRun("testMethod")
+        test.run(self.result)
+        assert("setUp testMethod tearDown " == test.log)
   
     def testResult(self):
         test = WasRun("testMethod")
-        result = test.run()
-        assert("1 run, 0 failed" == result.summary())
+        test.run(self.result)
+        assert("1 run, 0 failed" == self.result.summary())
   
     def testFailedResult(self):
         test = WasRun("testBrokenMethod")
-        result = test.run()
-        assert("1 run, 1 failed" == result.summary())
+        test.run(self.result)
+        assert("1 run, 1 failed" == self.result.summary())
   
+    def testFailedResultFormatting(self):
+        self.result.testStarted()
+        self.result.testFailed()
+        assert("1 run, 1 failed" == self.result.summary())
   
-print(TestCaseTest("testTemplateMethod").run().summary())
-print(TestCaseTest("testResult").run().summary())
-print(TestCaseTest("testFailedResult").run().summary())
-print(TestCaseTest("testFailedResultFormatting").run().summary())
+    def testSuite(self):
+        suite = TestSuite()
+        suite.add(WasRun("testMethod"))
+        suite.add(WasRun("testBrokenMethod"))
+        suite.run(self.result)
+        assert("2 run, 1 failed" == self.result.summary())
+  
+suite = TestSuite()
+suite.add(TestCaseTest("testTemplateMethod"))
+suite.add(TestCaseTest("testResult"))
+suite.add(TestCaseTest("testFailedResult"))
+suite.add(TestCaseTest("testFailedResultFormatting"))
+suite.add(TestCaseTest("testSuite"))
+result = TestResult()
+suite.run(result)
+print(result.summary())
 ```  
   

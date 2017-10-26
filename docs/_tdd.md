@@ -16,12 +16,12 @@ markdown:
 + [x] ~~setUpを最初に呼び出す~~
 + [x] ~~tearDownを後に呼び出す~~
 + [ ] テストメソッドが失敗したとしてもtearDownを呼び出す
-+ [ ] 複数のテストを走らせる
++ [x] ~~複数のテストを走らせる~~
 + [x] ~~収集したテスト結果を出力する~~
 + [x] ~~WasRunで文字列をログに記録する~~
 + [x] ~~失敗したテストを出力する~~
 + [ ] setUpのエラーをキャッチして出力する
-
++ [ ] TestCaseクラスからTestSuiteを作る
 
 ## コアモデル
 ```puml
@@ -40,18 +40,30 @@ class TestCase {
 class WasRun {
   log
   setUp()  
-  tearDown()
   testMethod()
+  testBrokenMethod()
+  tearDown()
 }
 class TestCaseTest {  
-  test
+  result
   setUp()
   testTemplateMethod()
+  testResult()
+  testFailedResult()
+  testFailedResultFormatting()
+  testSuite()
+}
+class TestSuite {
+  tests
+  add()
+  run()
 }
 TestCase <|-- TestCaseTest
 TestCase <|-- WasRun
 TestCaseTest -> WasRun
 TestCase -> TestResult
+TestSuite o--r TestCaseTest
+TestSuite --> TestResult
 ```
 
 ## `xunit.py`
